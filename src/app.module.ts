@@ -5,9 +5,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { CatsModule } from './cats/cats.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
-import { CatController } from './cat/cat.controller';
-import mongoose from 'mongoose';
+import { CatsController } from './cats/cats.controller';
 
+import mongoose from 'mongoose';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -17,7 +17,7 @@ import mongoose from 'mongoose';
     }),
     CatsModule,
   ],
-  controllers: [AppController, CatController],
+  controllers: [AppController, CatsController],
   providers: [AppService],
 })
 export class AppModule implements NestModule {
