@@ -1,17 +1,33 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common';
+import { currentUser } from './../common/decorators/user.decorator';
+import { AuthService } from './../auth/auth.service';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Request,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { CatRequestDto } from './dto/cats.request.dto';
 import { CatsService } from './cats.service';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { CatResponseDto } from './dto/cat.dto';
+import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
+import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 
 @Controller('cats')
 export class CatsController {
-  constructor(private catsService: CatsService) {}
+  constructor(
+    private catsService: CatsService,
+    private readonly authService: AuthService,
+  ) {}
   @Get()
   @ApiOperation({ summary: '회원가입' })
-  getCurrentCat() {
-    return 'current cat';
+  @UseGuards(JwtAuthGuard)
+  getCurrentCat(@currentUser() req) {
+    return req.user;
   }
 
   @Post()
@@ -28,9 +44,9 @@ export class CatsController {
   }
 
   @Post('login')
-  @ApiOperation({ summary: '회원가입' })
-  logIn() {
-    return 'logout';
+  @ApiOperation({ summary: '로그인' })
+  logIn(@Body() data: LoginRequestDto) {
+    return this.authService.jwtLogin(data);
   }
 
   @Post('logout')

@@ -8,13 +8,19 @@ import { CatRequestDto } from './dto/cats.request.dto';
 export class CatsRepository {
   constructor(@InjectModel(Cat.name) private catModel: Model<Cat>) {}
 
+  async findCatByIdWithoutPassword(catId: string): Promise<Cat | null> {
+    const cat = await this.catModel.findById(catId).select('-password');
+    return cat;
+  }
+
+  async findCatByEmail(email: string): Promise<Cat | null> {
+    const cat = await this.catModel.findOne({ email });
+    return cat;
+  }
+
   async existsByEmail(email: string): Promise<boolean> {
-    try {
-      const result = await this.catModel.exists({ email });
-      return result ? true : false;
-    } catch (err) {
-      throw new HttpException(err, 400);
-    }
+    const result = await this.catModel.exists({ email });
+    return result ? true : false;
   }
 
   async create(cat: CatRequestDto): Promise<Cat> {
