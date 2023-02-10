@@ -19,6 +19,8 @@ import { LoginRequestDto } from 'src/auth/dto/login.request.dto';
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard';
 import { SuccessInterceptor } from 'src/common/transfrom.interceptor';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { multerOptions } from 'src/common/util/multer.option';
+import { Cat } from './cats.schema';
 
 @Controller('cats')
 @UseInterceptors(SuccessInterceptor)
@@ -27,6 +29,13 @@ export class CatsController {
     private catsService: CatsService,
     private readonly authService: AuthService,
   ) {}
+
+  @Get('all')
+  async getAll(@Res() res: Response) {
+    const data = await this.catsService.getAllCat();
+    res.status(200).send(data);
+  }
+
   @Get()
   @ApiOperation({ summary: '회원가입' })
   @UseGuards(JwtAuthGuard)
@@ -55,8 +64,14 @@ export class CatsController {
 
   @Post('upload')
   @ApiOperation({ summary: '고양이 이미지 업로드' })
-  @UseInterceptors(FileInterceptor('image'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return 'uploadImg';
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('image', multerOptions('cats')))
+  uploadFile(
+    @UploadedFile() file: Express.Multer.File,
+    @currentUser() cat: Cat,
+  ) {
+    console.log(file);
+    // return { image: `http://localhost:8000/media/cats/${file.filename}` };
+    return this.catsService.uploadImg(cat, file);
   }
 }

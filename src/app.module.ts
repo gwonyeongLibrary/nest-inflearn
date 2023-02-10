@@ -7,6 +7,7 @@ import { CatsModule } from './cats/cats.module';
 import { LoggerMiddleware } from './logger/logger.middleware';
 import { CatsController } from './cats/cats.controller';
 import { AuthModule } from './auth/auth.module';
+import { CommentsModule } from './comments/comments.module';
 
 import mongoose from 'mongoose';
 @Module({
@@ -18,6 +19,7 @@ import mongoose from 'mongoose';
     }),
     CatsModule,
     AuthModule,
+    CommentsModule,
   ],
   controllers: [AppController, CatsController],
   providers: [AppService],

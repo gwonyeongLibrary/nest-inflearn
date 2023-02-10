@@ -4,10 +4,12 @@ import { ValidationPipe } from '@nestjs/common';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as expressBasicAuth from 'express-basic-auth';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import * as path from 'path';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  app.useGlobalPipes(new ValidationPipe()); // 등록
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  app.useGlobalPipes(new ValidationPipe({ transform: true })); // 등록
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.use(
@@ -20,6 +22,9 @@ async function bootstrap() {
     }),
   );
 
+  app.useStaticAssets(path.join(__dirname, './common', 'uploads'), {
+    prefix: '/media',
+  });
   const config = new DocumentBuilder()
     .setTitle('Cat swagger')
     .setDescription('cat')
